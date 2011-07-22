@@ -1,9 +1,6 @@
 use inc::Module::Install;
 version '5.005';
-
-feature     'Feature2',
-  -default    => 0,
-  'Bot::BasicBot' => 0;
+license 'Public Domain';
 
 requires(
   'DBI',
@@ -11,7 +8,8 @@ requires(
   'Text::Aspell',
   'IMDB::Film',
   'WWW::Google::Calculator',
-  'Love::Match::Calc');
+  'Love::Match::Calc',
+);
 
 auto_install;
 WriteAll;

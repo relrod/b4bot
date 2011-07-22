@@ -4,37 +4,17 @@
 # use strict;
 
 package MyBot;
-# CHANGEPROP: Let's use carton to install these ;)
+use Switch;
 use base qw( Bot::BasicBot );
 use LWP;
 use URI;
-use DBI;                        #for MySQL
+use DBI;
 use Weather::Underground;
 use Text::Aspell;
 use IMDB::Film;
 use URI::Escape;
 use WWW::Google::Calculator;
 use Love::Match::Calc;
-
-# CHANGEPROP: this is way bad. Why don't we just define them as needed? Or define it once and set_option() as needed.
-# Initialising variables used by modules...
-# Aspell #
-my $speller = Text::Aspell->new;
-my $speller1 = Text::Aspell->new;
-my $speller2 = Text::Aspell->new;
-my $speller3 = Text::Aspell->new;
-my $speller4 = Text::Aspell->new;
-$speller->set_option('lang','en_GB');
-$speller->set_option('sug-mode','fast');
-$speller1->set_option('lang','fr_FR');
-$speller1->set_option('sug-mode','fast');
-$speller2->set_option('lang','is_IS');
-$speller2->set_option('sug-mode','fast');
-$speller3->set_option('lang','ru_RU');
-$speller3->set_option('sug-mode','fast');
-$speller4->set_option('lang','cy_GB');
-$speller4->set_option('sug-mode','fast');
-# End Aspell #
 
 # CHANGEPROP: Config file this shit?
 # MySQL Config #
@@ -49,27 +29,21 @@ $dbh->{mysql_auto_reconnect} = 1;
 
 # CHANGEPROP: 'Custom.pm' module for this stuff?
 sub uptime(){
-  # For the sysinfo command
   use POSIX qw(ceil floor);
   open UPTIME,"<","/proc/uptime" or print $!;
   my @lines = <UPTIME>;
   $uptime = $lines[0];
-
   close UPTIME;
-
   @sys_ticks_arr = split(/ /,$uptime);
-  #print $sys_ticks_arr[0];
   $sys_ticks = $sys_ticks_arr[0];
   $min = $sys_ticks / 60;
   $hours = $min / 60;
   $days = floor($hours / 24);
   $hours = floor($hours - ($days * 24));
   $min = floor($min - ($days * 60 * 24) - ($hours * 60));
-
   if ($days != 0) {
     $result = "$days days ";
   }
-
   if ($hours != 0) {
     $result .= "$hours hours ";
   }
@@ -243,17 +217,31 @@ sub said {
     }
     return "$size suggestion(s) for $mispelled: $output"
   }
-  if ($message->{body} =~ /^\`aspellfr (.*)?/) {
-    my $mispelled = $1;
-    my $output = "";
-    if (!defined($mispelled)) { # <-- if that syntax errors, then look up how to use defined().. i think that's right though.
+
+
+  
+  if ($message->{body} =~ /^!!aspell(fr|is|ru|gb)? (.*)/) {
+    my $speller = Text::Aspell->new;
+    my $word_to_check = $2;
+    if ($1) {
+      return '$1 IS '.$1.' !!!';
+      switch ($1) {
+        case 'fr' { $speller->set_option('lang', 'fr_FR') }
+        case 'is' { $speller->set_option('lang', 'is_IS') }
+        case 'ru' { $speller->set_option('lang', 'ru_RU') }
+        case 'cy' { $speller->set_option('lang', 'cy_GB') }
+      }
     } else {
-      my @suggestions = $speller1->suggest( $mispelled );
-      $output .= join(", ", @suggestions);
-      $size = scalar @suggestions;
+      $speller->set_option('lang', 'en_US');
     }
-    return "$size suggestion(s) for $mispelled: $output"
+    my @suggestions = $speller->suggest($word_to_check);
+    $output .= join(", ", @suggestions);
+    $size = scalar @suggestions;
+    return $size.' suggestion(s) for '.$word_to_check.': '.$output;
   }
+
+
+  
   if ($message->{body} =~ /^\`aspellis (.*)?/) {
     my $mispelled = $1;
     my $output = "";
@@ -383,37 +371,12 @@ sub said {
 sub help { "I'm annoying, and I hunger for more deep-fried Chinamen." }
 
 # CHANGEPROP: CONFIG FILE DAMNIT!
-my $bot2 = MyBot->new(
-  nick => "b4bot",
-  server => "irc.connecttek.net",
-  channels => ['#connecttek,#caretown,#matthew'],
-  no_run => 1,
-);
-my $bot3 = MyBot->new(
-  nick => "b4bot",
-  server => "irc.freenode.net",
-  channels => ['##discuss,##sudoking,##eulalia,##gewt,#botters,#fossadopters'],
-  no_run => 1,
-);
 my $bot4 = MyBot->new(
-  nick => "ChrisHansen",
+  nick => "b4bot_codeblock",
   server => "onyx.ninthbit.net",
-  channels => ['#bots,#offtopic,#flood,#minecraft'],
+  channels => ['#flood'],
   no_run => 1,
 );
-my $bot8 = MyBot->new(
-  nick => "bot123",
-  server => "irc.sporksmoo.net",
-  channels => ['#sporks,#woomoo'],
-  no_run => 1,
-);
-my $bot = MyBot->new(
-  nick => "bot123",
-  server => "irc.alphachat.net",
-  channels => ['#lobby'],
-  no_run => 1,
-);
-
 
 print
   " ########  ##        ########   #######  ########
@@ -429,7 +392,7 @@ print "Codename: Disco Superfly\n";
 print "Written by b4, <b4\@gewt.net>, Some stuff by CodeBlock\n";
 print "This is b4bot 7.0-dev, A almost complete rewrite of b4bot.\n";
 print "http://hg.gewt.net/b4bot -- Website coming soon?\n";
-@bots = ($bot3,$bot4,$bot8);
+@bots = ($bot4);
 foreach $bot (@bots) {
   $bot->run();
 }

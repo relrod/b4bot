@@ -1,5 +1,6 @@
 use inc::Module::Install;
 version '5.005';
+license 'Public Domain';
 
 requires(
   'Bot::BasicBot',
@@ -8,7 +9,8 @@ requires(
   'Text::Aspell',
   'IMDB::Film',
   'WWW::Google::Calculator',
-  'Love::Match::Calc');
+  'Love::Match::Calc',
+);
 
 auto_install;
 WriteAll;

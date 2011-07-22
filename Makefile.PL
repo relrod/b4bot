@@ -10,6 +10,7 @@ requires(
   'IMDB::Film',
   'WWW::Google::Calculator',
   'Love::Match::Calc',
+  'YAML',
 );
 
 auto_install;

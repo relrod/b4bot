@@ -1,0 +1,10 @@
+database:
+  dsn: DBI:mysql:b4bot:localhost
+  username: root
+  password: ''
+bots:
+  - freenode:
+    nick: b4bot_stg_cb
+    server: onyx.ninthbit.net
+    channels: '#offtopic'
+comchar: '!!'

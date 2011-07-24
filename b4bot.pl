@@ -272,6 +272,21 @@ sub said {
       }
     }
 
+    when (/${comchar}(?:whatis|whatare) (.+)/) {
+      my $fact = $dbh->selectrow_hashref(
+        'SELECT name, meaning, action from factoids where name=? order by'.
+          ' id desc limit 1',
+        undef,
+        $1);
+      if ($fact) {
+        if ($fact->{'action'}) {
+          return chr(1).'ACTION '.$fact->{'meaning'}.chr(1);
+        } else {
+          return $fact->{'name'}.' is '.$fact->{'meaning'};
+        }
+      }
+    }
+    
   }
 }
 
@@ -285,18 +300,18 @@ my $bot4 = MyBot->new(
   no_run => 1,
 );
 
-print
-  " ########  ##        ########   #######  ########
+print <<ASCIIART;
+ ########  ##        ########   #######  ########
  ##     ## ##    ##  ##     ## ##     ##    ##
  ##     ## ##    ##  ##     ## ##     ##    ##
  ########  ##    ##  ########  ##     ##    ##
  ##     ## ######### ##     ## ##     ##    ##
  ##     ##       ##  ##     ## ##     ##    ##
- ########        ##  ########   #######     ## \n";
+ ########        ##  ########   #######     ##
+ASCIIART
 
-  print "Version 7.54.2\n";
-print "Codename: Disco Superfly\n";
-print "Written by b4, <b4\@gewt.net>, Some stuff by CodeBlock\n";
+print "Version 8.0\n";
+print "Written by b4, <b4\@gewt.net> and CodeBlock <codeblock\@fedoraproject.org\n";
 print "This is b4bot 7.0-dev, A almost complete rewrite of b4bot.\n";
 print "http://hg.gewt.net/b4bot -- Website coming soon?\n";
 my @bots = ($bot4);

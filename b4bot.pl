@@ -382,35 +382,10 @@ sub said {
 
 sub help { "I'm annoying, and I hunger for more deep-fried Chinamen." }
 
-# CHANGEPROP: CONFIG FILE DAMNIT!
-my $bot2 = MyBot->new(
-  nick => "b4bot",
-  server => "irc.connecttek.net",
-  channels => ['#connecttek,#caretown,#matthew'],
-  no_run => 1,
-);
-my $bot3 = MyBot->new(
-  nick => "b4bot",
-  server => "irc.freenode.net",
-  channels => ['##discuss,##sudoking,##eulalia,##gewt,#botters,#fossadopters'],
-  no_run => 1,
-);
-my $bot4 = MyBot->new(
-  nick => "ChrisHansen",
-  server => "onyx.ninthbit.net",
-  channels => ['#bots,#offtopic,#flood,#minecraft'],
-  no_run => 1,
-);
-my $bot8 = MyBot->new(
-  nick => "bot123",
-  server => "irc.sporksmoo.net",
-  channels => ['#sporks,#woomoo'],
-  no_run => 1,
-);
 my $bot = MyBot->new(
-  nick => "bot123",
-  server => "irc.alphachat.net",
-  channels => ['#lobby'],
+  nick => "b4bot_codeblock",
+  server => "irc.ninthbit.net",
+  channels => ['#flood'],
   no_run => 1,
 );
 
@@ -429,7 +404,7 @@ print "Codename: Disco Superfly\n";
 print "Written by b4, <b4\@gewt.net>, Some stuff by CodeBlock\n";
 print "This is b4bot 7.0-dev, A almost complete rewrite of b4bot.\n";
 print "http://hg.gewt.net/b4bot -- Website coming soon?\n";
-@bots = ($bot3,$bot4,$bot8);
+@bots = ($bot);
 foreach $bot (@bots) {
   $bot->run();
 }

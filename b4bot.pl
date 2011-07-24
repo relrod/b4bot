@@ -316,7 +316,7 @@ ASCIIART
 
 print "Version 8.0\n";
 print "Written by b4, <b4\@gewt.net> and CodeBlock <ricky\@elrod.me>\n";
-print "http://hg.gewt.net/b4bot -- Website coming soon?\n";
+print "http://www.github.com/codeblock/b4bot/\n";
 foreach my $bot (@bots) {
   $bot->run();
 }

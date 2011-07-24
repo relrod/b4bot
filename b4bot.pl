@@ -62,19 +62,57 @@ sub said {
   my ($self, $message) = @_;
 
   given ($message->{'body'}) {
+    
     when (/^${comchar}whoami/) {
       return 'You are: '.$message->{'raw_nick'};
     }
 
+    when (/^${comchar}meep/) {
+      return 'meep';
+    }
+
+    when (/^${comchar}sysinfo/) {
+      my $hostname = `hostname -f`;
+      my $kernel = `uname -r`;
+      chomp($hostname);
+      chomp($kernel);
+      return 'The host I run on ('.$hostname.') has an uptime of: '.uptime().
+        ' and uses kernel: '.$kernel;
+    }
+
+    when (/^${comchar}fortune/) {
+      my $fortune = `fortune -s`;
+      if (!$fortune) {
+        return 'Could not retrieve your fortune. You will die.';
+      } else {
+        chomp($fortune);
+        return $fortune;
+      }
+    }
+
+    when (/^${comchar}longfortune/) {
+      my $fortune = `fortune -l`;
+      if (!$fortune) {
+        return 'Could not retrieve a long fortune for you. You will die.';
+      } else {
+        chomp($fortune);
+        return $fortune;
+      }
+    }
+
+    when (/^${comchar}calc (.*)/) {
+      my $calculator = WWW::Google::Calculator->new;
+      return $calculator->calc($1);
+    }
+    
     when (/^${comchar}say (.*)/) {
-      $self->privmsg($message->{'channel'}, $1)
+      return $1;
     }
 
     when (/^${comchar}aspell(fr|is|ru|gb)? (.*)/) {
       my $speller = Text::Aspell->new;
       my $word_to_check = $2;
       if ($1) {
-        return '$1 IS '.$1.' !!!';
         given ($1) {
           when ('fr') { $speller->set_option('lang', 'fr_FR') }
           when ('is') { $speller->set_option('lang', 'is_IS') }
@@ -86,10 +124,18 @@ sub said {
       }
       my @suggestions = $speller->suggest($word_to_check);
       my $output .= join(", ", @suggestions);
+      if (!$output) {
+        return 'No suggestions were found for: '.$word_to_check;
+      }
       my $size = scalar @suggestions;
       return $size.' suggestion(s) for '.$word_to_check.': '.$output;
     }
 
+    when (/^${comchar}lcalc (.+) (.+)/) {
+      my $lovematch = lovematch($1, $2);
+      return 'Lovematch for '.$1.' and '.$2.': '.$lovematch.'%';
+    }
+      
     when (/^${comchar}ping/) {
       return "Pong"
     }
@@ -112,6 +158,63 @@ sub said {
         return 'FFFUUUUUUUUUU - Dat didn\'t work!';
       }
     }
+
+    # These are administrative commands. Eventually is_admin will check against the db.
+    when (/^\`join (.+)/) {
+      if (is_admin($message->{'raw_nick'})) {
+        $self->join($1);
+      }
+    }
+
+    when (/^\`topic (.+)/) {
+      if (is_admin($message->{'raw_nick'})) {
+        $self->privmsg('ChanServ', 'topic '.$message->{'channel'}.' '.$1);
+      }
+    }
+
+    when (/^\`kick (.+) ?(.+)?/) {
+      if (is_admin($message->{'raw_nick'})) {
+        if (!defined($2)) {
+          $self->privmsg('ChanServ', 'op '.$message->{'channel'});
+          $self->kick($message->{'channel'}, $1);
+        } else { 
+          $self->privmsg('ChanServ', 'op '.$message->{'channel'});
+          $self->kick($message->{'channel'}, $1.' '.$2);
+        }
+      }
+    }
+
+    when (/^\`op ?(.*)/) {
+      if (is_admin($message->{'raw_nick'})) {
+        if (!defined($1)) {
+          $self->privmsg('ChanServ', 'op '.$message->{'channel'}.' '.$message->{'who'});
+        } else {
+          $self->privmsg('ChanServ', 'op '.$message->{'channel'}.' '.$1);
+        }
+      }
+    }
+
+    when (/^\`deop ?(.*)/) {
+      if (is_admin($message->{'raw_nick'})) {
+        if (!defined($1)) {
+          $self->privmsg('ChanServ', 'deop '.$message->{'channel'}.' '.$message->{'who'});
+        } else {
+          $self->privmsg('ChanServ', 'deop '.$message->{'channel'}.' '.$1);
+        }
+      }
+    }
+
+    when (/^\`ban ?(.*)/) {
+      if (is_admin($message->{'raw_nick'})) {
+        $self->ban($message->{'channel'}, $1);
+      }
+    }
+
+    when (/^\`unban ?(.*)/) {
+      if (is_admin($message->{'raw_nick'})) {
+        $self->privmsg('ChanServ', 'akick del '.$message->{'channel'}.' '.$1);
+      }
+    }    
   }
 }
 

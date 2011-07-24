@@ -140,7 +140,7 @@ sub said {
       return "Pong"
     }
 
-    when (/^${comchar}weather (.+)/) {
+    when (/^${comchar}weather (\S.+)/) {
       my $weather = Weather::Underground->new(
         place => $1,
         debug => 0,
@@ -160,19 +160,19 @@ sub said {
     }
 
     # These are administrative commands. Eventually is_admin will check against the db.
-    when (/^\`join (.+)/) {
+    when (/^${comchar}join (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->join($1);
       }
     }
 
-    when (/^\`topic (.+)/) {
+    when (/^${comchar}topic (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->privmsg('ChanServ', 'topic '.$message->{'channel'}.' '.$1);
       }
     }
 
-    when (/^\`kick (.+) ?(.+)?/) {
+    when (/^${comchar}kick (.+) ?(.+)?/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($2)) {
           $self->privmsg('ChanServ', 'op '.$message->{'channel'});
@@ -184,7 +184,7 @@ sub said {
       }
     }
 
-    when (/^\`op ?(.*)/) {
+    when (/^${comchar}op ?(.*)/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($1)) {
           $self->privmsg('ChanServ', 'op '.$message->{'channel'}.' '.$message->{'who'});
@@ -194,7 +194,7 @@ sub said {
       }
     }
 
-    when (/^\`deop ?(.*)/) {
+    when (/^${comchar}deop ?(.*)/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($1)) {
           $self->privmsg('ChanServ', 'deop '.$message->{'channel'}.' '.$message->{'who'});
@@ -204,17 +204,72 @@ sub said {
       }
     }
 
-    when (/^\`ban ?(.*)/) {
+    when (/^${comchar}ban ?(.*)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->ban($message->{'channel'}, $1);
       }
     }
 
-    when (/^\`unban ?(.*)/) {
+    when (/^${comchar}unban ?(.*)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->privmsg('ChanServ', 'akick del '.$message->{'channel'}.' '.$1);
       }
-    }    
+    }
+
+    when (/${comchar}aquote (.+)/) {
+      my $query = $dbh->prepare(
+        'INSERT INTO quotes(meaning, quoter_nick, channel) VALUES(?, ?, ?)');
+      my $result = $query->execute(
+        $1,
+        $message->{'who'},
+        $message->{'channel'});
+      if ($result) {
+        my $qid = $dbh->last_insert_id(undef, undef, 'quotes', undef);
+        return 'Successfully added Quote '.$qid.', by '.$message->{'who'}.
+          ', to the QDB.';
+      } else {
+        return 'An error has occurred while trying to add '.$message->{'who'}.
+          '\'s quote.';
+      }
+    }
+
+    when (/${comchar}fquote (\d+)/) {
+      my $quote = $dbh->selectrow_hashref(
+        'SELECT id, meaning FROM quotes WHERE id=?',
+        undef,
+        $1);
+      if ($quote) {
+        return '['.$quote->{'id'}.'] '.$quote->{'meaning'};
+      } else {
+        return 'Could not fetch quote '.$1.' from the QDB';
+      }
+    }
+
+    
+    when (/${comchar}iquote (\d+)/) {
+      my $quote = $dbh->selectrow_hashref(
+        'SELECT * FROM quotes WHERE id=?',
+        undef,
+        $1);
+      if ($quote) {
+        return 'Quote '.$quote->{'id'}.' was added on '.
+          $quote->{'date_created'}.' in '.$quote->{'channel'}.' by '.
+          $quote->{'quoter_nick'};
+      } else {
+        return 'Could not fetch info about quote '.$1.'.';
+      }
+    }
+
+    when (/${comchar}rquote/) {
+      my $quote = $dbh->prepare(
+        'SELECT id, meaning FROM quotes ORDER BY RAND() LIMIT 1');
+      if ($quote) {
+        return '['.$quote->{'id'}.'] '.$quote->{'meaning'};
+      } else {
+        return 'An error has occurred, but this should never happen.';
+      }
+    }
+
   }
 }
 

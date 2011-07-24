@@ -3,8 +3,12 @@ database:
   username: root
   password: ''
 bots:
-  - freenode:
-    nick: b4bot_stg_cb
+  - ninthbit:
+    nick: b4bot_codeblock
     server: onyx.ninthbit.net
-    channels: '#offtopic'
+    channels: '#flood'
+  - freenode:
+    nick: b4bot_codeblock
+    server: irc.freenode.net
+    channels: '#fji2fA_test'
 comchar: '!!'

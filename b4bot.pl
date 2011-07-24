@@ -292,13 +292,17 @@ sub said {
 
 sub help { "I'm annoying, and I hunger for more deep-fried Chinamen." }
 
-# CHANGEPROP: CONFIG FILE DAMNIT!
-my $bot4 = MyBot->new(
-  nick => "b4bot_codeblock",
-  server => "irc.ninthbit.net",
-  channels => ['#flood'],
-  no_run => 1,
-);
+my @bots = ();
+foreach my $bot (@{$config->{'bots'}}) {
+  print "HI\n";
+  my $bot_obj = MyBot->new(
+    nick => $bot->{'nick'},
+    server => $bot->{'server'},
+    channels => $bot->{'channels'},
+    no_run => 1,
+  );
+  push(@bots, $bot_obj);
+}
 
 print <<ASCIIART;
  ########  ##        ########   #######  ########
@@ -312,9 +316,7 @@ ASCIIART
 
 print "Version 8.0\n";
 print "Written by b4, <b4\@gewt.net> and CodeBlock <codeblock\@fedoraproject.org\n";
-print "This is b4bot 7.0-dev, A almost complete rewrite of b4bot.\n";
 print "http://hg.gewt.net/b4bot -- Website coming soon?\n";
-my @bots = ($bot4);
 foreach my $bot (@bots) {
   $bot->run();
 }

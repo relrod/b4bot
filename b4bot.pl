@@ -140,7 +140,7 @@ sub said {
       return "Pong"
     }
 
-    when (/^${comchar}weather (\S.+)/) {
+    when (/^${comchar}weather (.+)/) {
       my $weather = Weather::Underground->new(
         place => $1,
         debug => 0,
@@ -148,14 +148,16 @@ sub said {
       if (!$weather) {
         return 'Could not create weather object. ('.$1.')';
       }
-      my $wx = $weather->get_weather()->[0];
+      my $wx = $weather->get_weather();
       if ($wx) {
+        $wx = $wx->[0];
         return 'Weather for '.$wx->{'place'}.': '.$wx->{'conditions'}.'. '.
           'Temperature: '.$wx->{'temperature_fahrenheit'}.'F, or '.
           $wx->{'temperature_celsius'}.'C. Wind is '.$wx->{'wind_direction'}.
           ' at '.$wx->{'wind_milesperhour'}.' MPH.';
       } else {
-        return 'FFFUUUUUUUUUU - Dat didn\'t work!';
+        return 'FFFUUUUUUUUUU - Dat didn\'t work! The location probably'.
+          ' could not be found.';
       }
     }
 

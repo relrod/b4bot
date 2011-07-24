@@ -186,7 +186,7 @@ sub said {
       }
     }
 
-    when (/^${comchar}op ?(.*)/) {
+    when (/^${comchar}op ?(.+)?/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($1)) {
           $self->privmsg('ChanServ', 'op '.$message->{'channel'}.' '.$message->{'who'});
@@ -196,7 +196,7 @@ sub said {
       }
     }
 
-    when (/^${comchar}deop ?(.*)/) {
+    when (/^${comchar}deop ?(.+)?/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($1)) {
           $self->privmsg('ChanServ', 'deop '.$message->{'channel'}.' '.$message->{'who'});
@@ -206,13 +206,13 @@ sub said {
       }
     }
 
-    when (/^${comchar}ban ?(.*)/) {
+    when (/^${comchar}ban (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->ban($message->{'channel'}, $1);
       }
     }
 
-    when (/^${comchar}unban ?(.*)/) {
+    when (/^${comchar}unban (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->privmsg('ChanServ', 'akick del '.$message->{'channel'}.' '.$1);
       }
@@ -253,17 +253,17 @@ sub said {
         'SELECT * FROM quotes WHERE id=?',
         undef,
         $1);
-      if ($quote) {
+      if ($quote && $quote->{'channel'}) {
         return 'Quote '.$quote->{'id'}.' was added on '.
           $quote->{'date_created'}.' in '.$quote->{'channel'}.' by '.
-          $quote->{'quoter_nick'};
+          $quote->{'quoter_nick'}.'.';
       } else {
         return 'Could not fetch info about quote '.$1.'.';
       }
     }
 
     when (/${comchar}rquote/) {
-      my $quote = $dbh->prepare(
+      my $quote = $dbh->selectrow_hashref(
         'SELECT id, meaning FROM quotes ORDER BY RAND() LIMIT 1');
       if ($quote) {
         return '['.$quote->{'id'}.'] '.$quote->{'meaning'};
@@ -294,7 +294,6 @@ sub help { "I'm annoying, and I hunger for more deep-fried Chinamen." }
 
 my @bots = ();
 foreach my $bot (@{$config->{'bots'}}) {
-  print "HI\n";
   my $bot_obj = MyBot->new(
     nick => $bot->{'nick'},
     server => $bot->{'server'},
@@ -314,7 +313,7 @@ print <<ASCIIART;
  ########        ##  ########   #######     ##
 ASCIIART
 
-print "Version 8.0\n";
+print "Version 8.0.1\n";
 print "Written by b4, <b4\@gewt.net> and CodeBlock <ricky\@elrod.me>\n";
 print "http://www.github.com/codeblock/b4bot/\n";
 foreach my $bot (@bots) {

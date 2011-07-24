@@ -253,6 +253,9 @@ sub said {
         'SELECT * FROM quotes WHERE id=?',
         undef,
         $1);
+
+      # Checking channel here because it is guaranteed to be there for all
+      # new quotes. If it there, the quote is in the new style/schema.
       if ($quote && $quote->{'channel'}) {
         return 'Quote '.$quote->{'id'}.' was added on '.
           $quote->{'date_created'}.' in '.$quote->{'channel'}.' by '.

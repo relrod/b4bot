@@ -132,6 +132,9 @@ sub said {
     }
 
     when (/^${comchar}lcalc (.+) (.+)/) {
+      if ($1 == '0') {
+        return 'First argument cannot be 0.';
+      }
       my $lovematch = lovematch($1, $2);
       return 'Lovematch for '.$1.' and '.$2.': '.$lovematch.'%';
     }

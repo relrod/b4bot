@@ -132,7 +132,7 @@ sub said {
     }
 
     when (/^${comchar}lcalc (.+) (.+)/) {
-      if ($1 == '0') {
+      if ($1 eq '0') {
         return 'First argument cannot be 0.';
       }
       my $lovematch = lovematch($1, $2);

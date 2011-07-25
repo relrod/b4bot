@@ -58,6 +58,16 @@ sub is_admin {
   return grep(shift eq $_, @admins);
 }
 
+sub help {
+  my $lyric = $dbh->selectrow_hashref(
+    'SELECT id, lyric FROM lyric ORDER BY RAND() LIMIT 1');
+  if ($lyric) {
+    return '['.$lyric->{'id'}.'] '.$lyric->{'meaning'};
+  } else {
+    return 'No lyric could be found.';
+  }
+}
+
 sub said {
   my ($self, $message) = @_;
 

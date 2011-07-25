@@ -306,8 +306,6 @@ sub said {
   }
 }
 
-sub help { "I'm annoying, and I hunger for more deep-fried Chinamen." }
-
 my @bots = ();
 foreach my $bot (@{$config->{'bots'}}) {
   my $bot_obj = MyBot->new(

@@ -133,11 +133,15 @@ sub said {
         $speller->set_option('lang', 'en_US');
       }
       my @suggestions = $speller->suggest($word_to_check);
-      my $output .= join(", ", @suggestions);
-      if (!$output) {
-        return 'No suggestions were found for: '.$word_to_check;
-      }
       my $size = scalar @suggestions;
+      if (!$size) {
+        return 'No suggestions were found for '.$word_to_check;
+      }
+      if (grep($word_to_check eq $_, @suggestions)) {
+        return 'YOU ARE FUCKING AWESOME YOU SPELLED IT RIGHT';
+      }
+      
+      my $output .= join(", ", @suggestions);
       return $size.' suggestion(s) for '.$word_to_check.': '.$output;
     }
 

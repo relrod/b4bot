@@ -15,6 +15,8 @@ use URI::Escape;
 use WWW::Google::Calculator;
 use Love::Match::Calc;
 use YAML;
+use Net::IP;
+use Socket;
 
 # TODO: Better handling if both of these fail.
 my $config = YAML::LoadFile($ARGV[0] || 'config.yaml');
@@ -306,7 +308,28 @@ sub said {
         }
       }
     }
-    
+
+    when (/${comchar}dns (.+)/) {
+      my $input = $1;
+      my $ip = new Net::IP($input);
+      if (!$ip) {
+        my @resolved_addrs = gethostbyname($input);
+        @resolved_addrs = map
+          { inet_ntoa($_) } @resolved_addrs[4 .. $#resolved_addrs];
+        if (!@resolved_addrs) {
+          return 'No IP address could be found for '.$input;
+        }
+        return join(', ', @resolved_addrs);
+      } else {
+        my $reverse_dns = gethostbyaddr(
+          inet_aton($input),
+          AF_INET);
+        if (!$reverse_dns) {
+          return 'Could not resolve address '.$input.' and btw, '.$reverse_dns.' <-- debug.';
+        }
+        return $reverse_dns;
+      }
+    } 
   }
 }
 

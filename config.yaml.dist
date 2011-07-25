@@ -6,7 +6,7 @@ bots:
   - ninthbit:
     nick: b4bot_codeblock
     server: onyx.ninthbit.net
-    channels: '#flood'
+    channels: '#offtopic'
   - freenode:
     nick: b4bot_codeblock
     server: irc.freenode.net

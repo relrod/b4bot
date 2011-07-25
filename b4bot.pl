@@ -42,12 +42,12 @@ sub uptime() {
   $min = floor($min - ($days * 60 * 24) - ($hours * 60));
   my $result;
   if ($days != 0) {
-    $result = '$days days ';
+    $result = $days.' days ';
   }
   if ($hours != 0) {
-    $result .= '$hours hours ';
+    $result .= $hours.' hours ';
   }
-  $result .= '$min minutes';
+  $result .= $min.' minutes';
   return $result;
 }
 

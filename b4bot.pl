@@ -17,6 +17,7 @@ use Love::Match::Calc;
 use YAML;
 use Net::IP;
 use Socket;
+use Proc::Daemon;
 
 # TODO: Better handling if both of these fail.
 my $config = YAML::LoadFile($ARGV[0] || 'config.yaml');
@@ -333,6 +334,7 @@ sub said {
   }
 }
 
+Proc::Daemon::Init;
 my @bots = ();
 foreach my $bot (@{$config->{'bots'}}) {
   my $bot_obj = MyBot->new(
@@ -360,6 +362,7 @@ print "http://www.github.com/codeblock/b4bot/\n";
 foreach my $bot (@bots) {
   $bot->run();
 }
+
 use POE;
 $poe_kernel->run();
 

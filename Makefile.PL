@@ -11,6 +11,7 @@ requires(
   'WWW::Google::Calculator',
   'Love::Match::Calc',
   'YAML',
+  'Proc::Daemon',
 );
 
 auto_install;

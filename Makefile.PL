@@ -12,6 +12,7 @@ requires(
   'Love::Match::Calc',
   'YAML',
   'Proc::Daemon',
+  'Net::IP',
 );
 
 auto_install;

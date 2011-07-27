@@ -17,10 +17,9 @@ use Love::Match::Calc;
 use YAML;
 use Net::IP;
 use Socket;
-use Proc::Daemon;
 
 # TODO: Better handling if both of these fail.
-my $config = YAML::LoadFile($ARGV[0] || 'config.yaml');
+my $config = YAML::LoadFile('config.yaml');
 my $comchar = $config->{'comchar'};
 
 my $dbh = DBI->connect(
@@ -330,11 +329,17 @@ sub said {
         }
         return $reverse_dns;
       }
-    } 
+    }
   }
 }
 
-Proc::Daemon::Init;
+if (!grep($_ eq '-d', @ARGV)) {
+  use Proc::Daemon;
+  Proc::Daemon::Init;
+} else {
+  print "Running in debug/detached mode.\n";
+}
+
 my @bots = ();
 foreach my $bot (@{$config->{'bots'}}) {
   my $bot_obj = MyBot->new(

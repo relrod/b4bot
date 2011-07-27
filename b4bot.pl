@@ -330,6 +330,25 @@ sub said {
         return $reverse_dns;
       }
     }
+
+    when (/${comchar}headers (.+)/) {
+      my $useragent = LWP::UserAgent->new();
+      my $headers = $useragent->head($1)->headers;
+      my @header_array;
+      while (my ($key, $value) = each(%$headers)) {
+        if (ref(\$value) ne 'ARRAY') {
+          push(@header_array, $key.': '.$value);
+        }
+      }
+      use Data::Dumper; print Dumper(@header_array);
+      $self->notice(
+        $message->{'who'},
+        'Headers for '.$1.': '.join(', ', @header_array));
+      return 'DEBUG: '.join(', ', @header_array);
+      return $message->{'who'}.': The headers for '.$1.
+        ' have been NOTICED to you.';
+    }
+
   }
 }
 

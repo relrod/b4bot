@@ -70,10 +70,40 @@ sub help {
   }
 }
 
+# The purpose of this is to store the last line somebody sends in a channel.
+# The array looks like this:
+# $lines = {
+#   '#offtopic' => {
+#     'duckinator' => {
+#       'time' => 1311894413,
+#       'message' => 'Ello, Govna!',
+#   }
+# }
+my $lines;
+
 sub said {
   my ($self, $message) = @_;
 
-  given ($message->{'body'}) {
+  my $utf8message = $message->{'body'};
+  utf8::encode($utf8message);
+
+  $lines->{$message->{'channel'}}->{$message->{'who'}} = {
+    'time' => scalar localtime(),
+    'message' => $utf8message,
+  };
+  
+
+  given ($utf8message) {
+
+    when (/^${comchar}lastmsg (.+)/) {
+      my $lastseen = $lines->{$message->{'channel'}}->{$1};
+      if ($lastseen) {
+        return $1.' was last seen in this channel at '.$lastseen->{'time'}.
+          ' saying, "'.$lastseen->{'message'}.'"';
+      } else {
+        return $1.' does not appear to have spoken here.';
+      }
+    }
     
     when (/^${comchar}whoami/) {
       return 'You are: '.$message->{'raw_nick'};

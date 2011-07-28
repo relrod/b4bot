@@ -73,7 +73,10 @@ sub help {
 sub said {
   my ($self, $message) = @_;
 
-  given ($message->{'body'}) {
+  my $utf8message = $message->{'body'};
+  utf8::encode($utf8message);
+
+  given ($utf8message) {
     
     when (/^${comchar}whoami/) {
       return 'You are: '.$message->{'raw_nick'};

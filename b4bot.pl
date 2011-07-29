@@ -95,11 +95,11 @@ sub said {
 
   given ($utf8message) {
 
-    when (/^${comchar}time/) {
+    when (/${comchar}time/) {
       return scalar localtime();
     }
 
-    when (/^${comchar}lastmsg (.+)/) {
+    when (/${comchar}lastmsg (.+)/) {
       my $lastseen = $lines->{$message->{'channel'}}->{$1};
       if ($lastseen) {
         return $1.' was last seen in this channel at '.$lastseen->{'time'}.
@@ -109,15 +109,15 @@ sub said {
       }
     }
     
-    when (/^${comchar}whoami/) {
+    when (/${comchar}whoami/) {
       return 'You are: '.$message->{'raw_nick'};
     }
 
-    when (/^${comchar}meep/) {
+    when (/${comchar}meep/) {
       return 'meep';
     }
 
-    when (/^${comchar}sysinfo/) {
+    when (/${comchar}sysinfo/) {
       my $hostname = `hostname -f`;
       my $kernel = `uname -r`;
       chomp($hostname);
@@ -136,7 +136,7 @@ sub said {
       }
     }
 
-    when (/^${comchar}longfortune/) {
+    when (/${comchar}longfortune/) {
       my $fortune = `fortune -l`;
       if (!$fortune) {
         return 'Could not retrieve a long fortune for you. You will die.';
@@ -146,16 +146,16 @@ sub said {
       }
     }
 
-    when (/^${comchar}calc (.*)/) {
+    when (/${comchar}calc (.*)/) {
       my $calculator = WWW::Google::Calculator->new;
       return $calculator->calc($1);
     }
     
-    when (/^${comchar}say (.*)/) {
+    when (/${comchar}say (.*)/) {
       return $1;
     }
 
-    when (/^${comchar}aspell(fr|is|ru|gb)? (.*)/) {
+    when (/${comchar}aspell(fr|is|ru|gb)? (.*)/) {
       my $speller = Text::Aspell->new;
       my $word_to_check = $2;
       if ($1) {
@@ -181,7 +181,7 @@ sub said {
       return $size.' suggestion(s) for '.$word_to_check.': '.$output;
     }
 
-    when (/^${comchar}lcalc (.+) (.+)/) {
+    when (/${comchar}lcalc (.+) (.+)/) {
       if ($1 eq '0') {
         return 'First argument cannot be 0.';
       }
@@ -189,11 +189,11 @@ sub said {
       return 'Lovematch for '.$1.' and '.$2.': '.$lovematch.'%';
     }
       
-    when (/^${comchar}ping/) {
+    when (/${comchar}ping/) {
       return "Pong"
     }
 
-    when (/^${comchar}weather (.+)/) {
+    when (/${comchar}weather (.+)/) {
       my $weather = Weather::Underground->new(
         place => $1,
         debug => 0,
@@ -215,19 +215,19 @@ sub said {
     }
 
     # These are administrative commands. Eventually is_admin will check against the db.
-    when (/^${comchar}join (.+)/) {
+    when (/${comchar}join (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->join($1);
       }
     }
 
-    when (/^${comchar}topic (.+)/) {
+    when (/${comchar}topic (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->privmsg('ChanServ', 'topic '.$message->{'channel'}.' '.$1);
       }
     }
 
-    when (/^${comchar}kick (.+) ?(.+)?/) {
+    when (/${comchar}kick (.+) ?(.+)?/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($2)) {
           $self->privmsg('ChanServ', 'op '.$message->{'channel'});
@@ -239,7 +239,7 @@ sub said {
       }
     }
 
-    when (/^${comchar}op ?(.+)?/) {
+    when (/${comchar}op ?(.+)?/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($1)) {
           $self->privmsg('ChanServ', 'op '.$message->{'channel'}.' '.$message->{'who'});
@@ -249,7 +249,7 @@ sub said {
       }
     }
 
-    when (/^${comchar}deop ?(.+)?/) {
+    when (/${comchar}deop ?(.+)?/) {
       if (is_admin($message->{'raw_nick'})) {
         if (!defined($1)) {
           $self->privmsg('ChanServ', 'deop '.$message->{'channel'}.' '.$message->{'who'});
@@ -259,13 +259,13 @@ sub said {
       }
     }
 
-    when (/^${comchar}ban (.+)/) {
+    when (/${comchar}ban (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->ban($message->{'channel'}, $1);
       }
     }
 
-    when (/^${comchar}unban (.+)/) {
+    when (/${comchar}unban (.+)/) {
       if (is_admin($message->{'raw_nick'})) {
         $self->privmsg('ChanServ', 'akick del '.$message->{'channel'}.' '.$1);
       }

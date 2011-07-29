@@ -11,4 +11,4 @@ bots:
     nick: b4bot_codeblock
     server: irc.freenode.net
     channels: '#fji2fA_test'
-comchar: '!!'
+comchar: '^!!'

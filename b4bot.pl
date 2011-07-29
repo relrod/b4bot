@@ -95,6 +95,10 @@ sub said {
 
   given ($utf8message) {
 
+    when (/^${comchar}time/) {
+      return scalar localtime();
+    }
+
     when (/^${comchar}lastmsg (.+)/) {
       my $lastseen = $lines->{$message->{'channel'}}->{$1};
       if ($lastseen) {

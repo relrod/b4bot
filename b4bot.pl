@@ -17,6 +17,7 @@ use Love::Match::Calc;
 use YAML;
 use Net::IP;
 use Socket;
+use Weather::Google;
 
 # TODO: Better handling if both of these fail.
 my $config = YAML::LoadFile('config.yaml');
@@ -212,6 +213,32 @@ sub said {
         return 'FFFUUUUUUUUUU - Dat didn\'t work! The location probably'.
           ' could not be found.';
       }
+    }
+
+    when (/${comchar}gweather (.+)/) {
+      my $wx_query = $1;
+      my $weather = new Weather::Google($wx_query)->current();
+      if (!$weather) {
+        return 'FFFFFUUUUUUUUUUUUUUUUUU! Sorry, something went wrong.';
+      } else {
+        return 'Weather for `'.$1.'`: Current conditions: '.
+          $weather->{'condition'}.'. Temperature: '.$weather->{'temp_f'}.
+            'F or '.$weather->{'temp_c'}.'C. '.$weather->{'wind_condition'}.
+            '. '.$weather->{'humidity'}.'.';
+      }
+    }
+
+    when (/${comchar}forecast (.+)/) {
+      my $wx_query = $1;
+      my $weather = new Weather::Google($wx_query);
+      my $forecast = 'Forecast for `'.$wx_query.'`: ';
+      for my $day (0..3) {
+        my $g_forecast = $weather->forecast($day);
+        $forecast .= $g_forecast->{'day_of_week'}.': '.
+          $g_forecast->{'condition'}.'; High/Low: '.
+          $g_forecast->{'high'}.'F/'.$g_forecast->{'low'}.'F.  ';
+      }
+      return $forecast;
     }
 
     # These are administrative commands. Eventually is_admin will check against the db.

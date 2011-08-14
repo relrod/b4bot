@@ -13,6 +13,7 @@ requires(
   'YAML',
   'Proc::Daemon',
   'Net::IP',
+  'Weather::Google',
 );
 
 auto_install;

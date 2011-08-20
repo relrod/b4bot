@@ -137,7 +137,7 @@ sub said {
         $site =~ s/\n/ /g;
         $site =~ s/\r/ /g;
         $site =~ s/\s+/ /g;
-        if ($site =~ /<title>(.*)<\/title>/is) {
+        if ($site =~ /<title>(.+?)<\/title>/is) {
           my $title = HTML::Entities::decode_entities($1);
           $title =~ s/^\s+|\s+$//g;
           return '"'.$title.'"';

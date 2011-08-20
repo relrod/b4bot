@@ -14,6 +14,8 @@ requires(
   'Proc::Daemon',
   'Net::IP',
   'Weather::Google',
+  'HTML::Entities',
+  'Image::Size',
 );
 
 auto_install;

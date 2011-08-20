@@ -5,7 +5,7 @@ use strict;
 package MyBot;
 use feature 'switch';
 use base qw( Bot::BasicBot );
-use LWP;
+use LWP::UserAgent;
 use URI;
 use DBI;
 use Weather::Underground;
@@ -18,6 +18,8 @@ use YAML;
 use Net::IP;
 use Socket;
 use Weather::Google;
+use HTML::Entities;
+use Image::Size;
 
 # TODO: Better handling if both of these fail.
 my $config = YAML::LoadFile('config.yaml');
@@ -95,6 +97,53 @@ sub said {
   
 
   given ($utf8message) {
+
+    # 02:55:47 < duckinator> CodeBlock, scott: <>/[] (i like [] because it's quicker to type, but <> is common) always announce it, "`info url" be the same as [url]/<url>, "`info" get info about the last url mentioned (and in THIS CASE ONLY, prepend the url to the reply)?
+
+
+    when (/(https?:\/\/[\S]+)/i) {
+      my $url = $1;
+      my $ua = LWP::UserAgent->new();
+      $ua->agent('Mozilla/5.0');
+      $ua->max_redirect(3);
+
+      if ($url =~ /(?:jpg|gif|psd|bpm|png|jpeg|tiff|tif)$/i) {
+        # This is an image. Or at least we're going to treat it as such.
+        $ua->timeout(6);
+        $ua->max_size(5120);
+        my $picture = $ua->get($url);
+        my $picture_content = $picture->decoded_content();
+        my $size_bytes = $picture->content_length();
+        my ($size_text, $suffix) = '';
+        if ($size_bytes) {
+          # Kilobytes
+          my $size = $size_bytes/1024;
+          if ($size > 1024) {
+            # It is over 1MB, so report it in MB.
+            $size = $size / 1024;
+            $suffix = 'MB';
+          } else {
+            $suffix = 'KB';
+          }
+          $size_text = '('.sprintf('%.2f', $size).$suffix.')';
+        }
+        my($width,$height) = Image::Size::imgsize(\$picture_content);
+        return 'Image size: '.$width.'x'.$height.' px '.$size_text;
+      } else {
+        $ua->timeout(3);
+        $ua->max_size(2048);
+        my $site = $ua->get($url)->decoded_content;
+        $site =~ s/[^(\x20-\x7F)]*//g;
+        $site =~ s/\n/ /g;
+        $site =~ s/\r/ /g;
+        $site =~ s/\s+/ /g;
+        if ($site =~ /<title>(.*)<\/title>/is) {
+          my $title = HTML::Entities::decode_entities($1);
+          $title =~ s/^\s+|\s+$//g;
+          return '"'.$title.'"';
+        }
+      }
+    }
 
     when (/${comchar}time/) {
       return scalar localtime();

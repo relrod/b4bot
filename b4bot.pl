@@ -73,6 +73,20 @@ sub help {
   }
 }
 
+sub ellipsify {
+  my $string = shift;
+  my $max_length = shift || 150;
+  my $left = shift || '';
+  my $right = shift || '';
+  my $append_truncated = shift || '[truncated]';
+  my $substring =  substr($string, 0, $max_length);
+  if (length($string) > length($substring)) {
+    return $left.$substring.'...'.$right.' '.$append_truncated;
+  } else {
+    return $left.$substring.$right;
+  }
+}
+
 # The purpose of this is to store the last line somebody sends in a channel.
 # The array looks like this:
 # $lines = {
@@ -140,7 +154,7 @@ sub said {
         if ($site =~ /<title>(.+?)<\/title>/is) {
           my $title = HTML::Entities::decode_entities($1);
           $title =~ s/^\s+|\s+$//g;
-          return '"'.$title.'"';
+          return ellipsify($title, 200, '"', '"');
         }
       }
     }

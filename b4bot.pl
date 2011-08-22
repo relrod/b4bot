@@ -108,7 +108,6 @@ sub said {
     'time' => scalar localtime(),
     'message' => $utf8message,
   };
-  
 
   given ($utf8message) {
 
@@ -172,7 +171,7 @@ sub said {
         return $1.' does not appear to have spoken here.';
       }
     }
-    
+
     when (/${comchar}whoami/) {
       return 'You are: '.$message->{'raw_nick'};
     }
@@ -214,7 +213,7 @@ sub said {
       my $calculator = WWW::Google::Calculator->new;
       return $calculator->calc($1);
     }
-    
+
     when (/${comchar}say (.*)/) {
       return $1;
     }
@@ -240,7 +239,7 @@ sub said {
       if (grep($word_to_check eq $_, @suggestions)) {
         return 'YOU ARE FUCKING AWESOME YOU SPELLED IT RIGHT';
       }
-      
+
       my $output .= join(", ", @suggestions);
       return $size.' suggestion(s) for '.$word_to_check.': '.$output;
     }
@@ -252,7 +251,7 @@ sub said {
       my $lovematch = lovematch($1, $2);
       return 'Lovematch for '.$1.' and '.$2.': '.$lovematch.'%';
     }
-      
+
     when (/${comchar}ping/) {
       return "Pong"
     }
@@ -390,7 +389,6 @@ sub said {
       }
     }
 
-    
     when (/${comchar}iquote (\d+)/) {
       my $quote = $dbh->selectrow_hashref(
         'SELECT * FROM quotes WHERE id=?',

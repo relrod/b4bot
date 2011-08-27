@@ -20,6 +20,7 @@ use Socket;
 use Weather::Google;
 use HTML::Entities;
 use Image::Size;
+use Net::Dict;
 
 # TODO: Better handling if both of these fail.
 my $config = YAML::LoadFile('config.yaml');
@@ -156,6 +157,19 @@ sub said {
           return ellipsify($title, 200, '"', '"');
         }
       }
+    }
+
+    when (/${comchar}define (.+)/) {
+      my $word = $1;
+      my $dictionary = Net::Dict->new('dict.org');
+      $dictionary->setDicts('wn', 'web1913');
+      my $definition = $dictionary->define($word);
+      $definition = $definition->[0]->[1];
+      $definition =~ s/\n//g;
+      $definition =~ s/\r//g;
+      $definition =~ s/\t//g;
+      $definition =~ s/ +/ /g;
+      return ellipsify($definition, 200);
     }
 
     when (/${comchar}time/) {

@@ -16,6 +16,7 @@ requires(
   'Weather::Google',
   'HTML::Entities',
   'Image::Size',
+  'Net::Dict',
 );
 
 auto_install;

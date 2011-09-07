@@ -17,6 +17,7 @@ requires(
   'HTML::Entities',
   'Image::Size',
   'Net::Dict',
+  'JSON'
 );
 
 auto_install;

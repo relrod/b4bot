@@ -21,6 +21,7 @@ use Weather::Google;
 use HTML::Entities;
 use Image::Size;
 use Net::Dict;
+use JSON;
 
 # TODO: Better handling if both of these fail.
 my $config = YAML::LoadFile('config.yaml');
@@ -120,6 +121,16 @@ sub said {
       my $ua = LWP::UserAgent->new();
       $ua->agent('Mozilla/5.0');
       $ua->max_redirect(3);
+
+      if($url =~ /twitter\.com\/#\!\/(.*?)\/status\/([0-9]+)/) {
+	my $user = $1;
+        my $id = $2;
+	my $content = $ua->get('http://api.twitter.com/1/statuses/show.json?id=' . $id)->decoded_content();
+	my $json = decode_json($content);
+
+	return '@' . $user . ': "' . $json->{text} . '"';
+
+      }
 
       if ($url =~ /(?:jpg|gif|psd|bpm|png|jpeg|tiff|tif)$/i) {
         # This is an image. Or at least we're going to treat it as such.

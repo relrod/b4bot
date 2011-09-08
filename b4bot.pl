@@ -123,13 +123,14 @@ sub said {
       $ua->max_redirect(3);
 
       if($url =~ /twitter\.com\/#\!\/(.*?)\/status\/([0-9]+)/) {
-	my $user = $1;
+        my $user = $1;
         my $id = $2;
-	my $content = $ua->get('http://api.twitter.com/1/statuses/show.json?id=' . $id)->decoded_content();
-	my $json = decode_json($content);
-
-	return '@' . $user . ': "' . $json->{text} . '"';
-
+        $ua->timeout(3);
+        my $content = $ua->get(
+          'http://api.twitter.com/1/statuses/show.json?id='.$id);
+        $content = $content->decoded_content();
+        my $json = decode_json($content);
+        return '@'.$user.': "'.$json->{text}.'"';
       }
 
       if ($url =~ /(?:jpg|gif|psd|bpm|png|jpeg|tiff|tif)$/i) {

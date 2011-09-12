@@ -136,7 +136,7 @@ sub said {
       if ($url =~ /(?:jpg|gif|psd|bpm|png|jpeg|tiff|tif)$/i) {
         # This is an image. Or at least we're going to treat it as such.
         $ua->timeout(6);
-        $ua->max_size(5120);
+        $ua->max_size(10120);
         my $picture = $ua->get($url);
         my $picture_content = $picture->decoded_content();
         my $size_bytes = $picture->content_length();

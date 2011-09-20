@@ -166,7 +166,7 @@ sub said {
         if ($site =~ /<title>(.+?)<\/title>/is) {
           my $title = HTML::Entities::decode_entities($1);
           $title =~ s/^\s+|\s+$//g;
-          return ellipsify($title, 200, '"', '"');
+          $self->reply($message, ellipsify($title, 200, '"', '"'));
         }
       }
     }

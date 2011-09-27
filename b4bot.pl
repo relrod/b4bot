@@ -27,11 +27,13 @@ use JSON;
 my $config = YAML::LoadFile('config.yaml');
 my $comchar = $config->{'comchar'};
 
-my $dbh = DBI->connect(
-  $config->{'database'}->{'dsn'},
-  $config->{'database'}->{'username'},
-  $config->{'database'}->{'password'});
-$dbh->{mysql_auto_reconnect} = 1;
+my $dbh = "nope";
+
+#my $dbh = DBI->connect(
+#  $config->{'database'}->{'dsn'},
+#  $config->{'database'}->{'username'},
+#  $config->{'database'}->{'password'});
+#$dbh->{mysql_auto_reconnect} = 1;
 
 # CHANGEPROP: 'Custom.pm' module for this stuff?
 sub uptime() {
@@ -122,15 +124,26 @@ sub said {
       $ua->agent('Mozilla/5.0');
       $ua->max_redirect(3);
 
-      if($url =~ /twitter\.com\/#\!\/(.*?)\/status\/([0-9]+)/) {
-        my $user = $1;
-        my $id = $2;
+      if ($url =~ /twitter\.com\/.*?\/status\/([0-9]+)/) {
+        my $id = $1;
         $ua->timeout(3);
         my $content = $ua->get(
           'http://api.twitter.com/1/statuses/show.json?id='.$id);
         $content = $content->decoded_content();
+
+	# because Twitter's API redirects to an HTML error page sometimes
+	if($content =~ m/</) {
+	  return "Twitter / Error";
+	}
+
         my $json = decode_json($content);
-        return '@'.$user.': "'.$json->{text}.'"';
+	
+	# An error occured
+	if ($json->{error}) {
+	  return $json->{error};
+	}
+
+        return '@'.$json->{user}->{name}.': "'.$json->{text}.'"';
       }
 
       if ($url =~ /(?:jpg|gif|psd|bpm|png|jpeg|tiff|tif)$/i) {

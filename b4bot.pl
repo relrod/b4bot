@@ -27,13 +27,11 @@ use JSON;
 my $config = YAML::LoadFile('config.yaml');
 my $comchar = $config->{'comchar'};
 
-my $dbh = "nope";
-
-#my $dbh = DBI->connect(
-#  $config->{'database'}->{'dsn'},
-#  $config->{'database'}->{'username'},
-#  $config->{'database'}->{'password'});
-#$dbh->{mysql_auto_reconnect} = 1;
+my $dbh = DBI->connect(
+  $config->{'database'}->{'dsn'},
+  $config->{'database'}->{'username'},
+  $config->{'database'}->{'password'});
+$dbh->{mysql_auto_reconnect} = 1;
 
 # CHANGEPROP: 'Custom.pm' module for this stuff?
 sub uptime() {

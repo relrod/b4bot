@@ -130,16 +130,16 @@ sub said {
         $content = $content->decoded_content();
 
 	# because Twitter's API redirects to an HTML error page sometimes
-	if($content =~ m/</) {
-	  return "Twitter / Error";
-	}
+        if ($content =~ m/</) {
+          return 'Twitter / Error';
+        }
 
         my $json = decode_json($content);
 	
-	# An error occured
-	if ($json->{error}) {
-	  return $json->{error};
-	}
+        # An error occured
+        if ($json->{error}) {
+        return $json->{error};
+        }
 
         return '@'.$json->{user}->{name}.': "'.$json->{text}.'"';
       }

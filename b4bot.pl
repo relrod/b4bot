@@ -129,7 +129,7 @@ sub said {
           'http://api.twitter.com/1/statuses/show.json?id='.$id);
         $content = $content->decoded_content();
 
-	# because Twitter's API redirects to an HTML error page sometimes
+        # because Twitter's API redirects to an HTML error page sometimes
         if ($content =~ m/</) {
           return 'Twitter / Error';
         }

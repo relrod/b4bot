@@ -127,10 +127,17 @@ sub said {
         $ua->timeout(3);
         my $content = $ua->get(
           'http://api.twitter.com/1/statuses/show.json?id='.$id);
+
+        # If you flood twitter, you'll get messed up JSON content due
+        # to $ua->get() timing out.
+        if ($content->code() != HTTP::Status::HTTP_OK) {
+          return 'Twitter / Error';
+        }
+
         $content = $content->decoded_content();
 
         # because Twitter's API redirects to an HTML error page sometimes
-        if ($content =~ m/</) {
+        if ($content =~ m/^</) {
           return 'Twitter / Error';
         }
 
@@ -138,7 +145,7 @@ sub said {
 	
         # An error occured
         if ($json->{error}) {
-        return $json->{error};
+          return $json->{error};
         }
 
         return '@'.$json->{user}->{name}.': "'.$json->{text}.'"';
